@@ -6,16 +6,18 @@ public class Game {
     private ArrayList<Ship> listOfShips = new ArrayList<>();
     private int numOfGuesses = 0;
     private String[] listOfShipNames = {"Boaty McBoatyface", "SS Enterprise", "Shippy McShipface", "Sailboat", "Rowboat", "Dead boat", "Curiosity", "Spirit", "Sojourner", "Opportunity", "Apollo 11", "Hubble Space Telescope", "Deathboat", "Lifeboat", "International Space Station", "Queequeg", "Argo"};
+    //private int numShips = 0;
 
-    private void setupGame(int numShips) {
+    public void setupGame(int numShips) {
         for (int i = 0; i < numShips; i++) {
             Ship ship = new Ship(3, listOfShipNames[i]);
             listOfShips.add(ship);
         }
+        //this.numShips = numShips;
         System.out.println("Your goal is to sink " + listOfShips.size() + " ships. Good luck!");
     }
 
-    private void startPlaying() {
+    public void startPlaying() {
         while (!listOfShips.isEmpty()) {
             String userGuess = getUserInput();
             checkUserGuess(userGuess);
@@ -43,9 +45,9 @@ public class Game {
 
     private void finishGame() {
         System.out.println("All ships have been sunk!");
-        if (numOfGuesses == 9) {
+        if (numOfGuesses == listOfShips.size() * 3) {
             System.out.println("Perfect! You sunk the ships in the minimum number of guesses!");
-        } else if (numOfGuesses <= 18) {
+        } else if (numOfGuesses <= listOfShips.size() * 4) {
             System.out.println("Pretty good!");
         } else {
             System.out.println("Took you long enough.");
@@ -54,16 +56,9 @@ public class Game {
     }
 
     private String getUserInput() {
-        System.out.println("Take a guess (e.g. a0) a-g, 0-6");
+        System.out.println("Take a guess (e.g. a0) a-j, 0-9");
         return scan.nextLine();
     }
 
-    public static void main(String[] args) {
-        Scanner scones = new Scanner(System.in);
-        Game game = new Game();
-        System.out.println("How many ships? (number from 1 - 7)");
-        int numShips = Integer.parseInt(scones.nextLine());
-        game.setupGame(numShips);
-        game.startPlaying();
-    }
+
 }
