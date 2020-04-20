@@ -1,26 +1,29 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Ship {
     private ArrayList<String> locationCells;
     private String name;
-    private ArrayList<String> takenCoords = new ArrayList<String>();
+    private ArrayList<String> takenCoords = new ArrayList<>();
     /*public void setLocationCells(ArrayList<String> locations) {
         this.locationCells = locations;
     }*/
-
+    private enum Status {
+        MISS,
+        HIT,
+        KILL
+    }
     public String checkYourself(String stringGuess) {
         int index = locationCells.indexOf(stringGuess);
-        String result = "miss";
+        Status result = Status.MISS;
         if(index >= 0){
             locationCells.remove(index);
             if (locationCells.isEmpty()) {
-                result = "kill";
+                result = Status.KILL;
             } else {
-                result = "hit";
+                result = Status.HIT;
             }
         }
-        return result;
+        return String.valueOf(result);
     }
 
     public String getName() {
@@ -37,68 +40,57 @@ public class Ship {
     }*/
 
     private static final String alphabet = "abcdefghijklmnopqrstuvwxyz";
-    private int gridLength = 7;
-    private int gridSize = 49;
-    private int[] grid = new int[gridSize];
+    private int gridLength = 10;
     private int shipCount = 0;
 
     ArrayList<String> placeShip(int shipSize) {
-        ArrayList<String> alphaCells = new ArrayList<String>();
-        String temp = null;
-        int[] coords = new int[shipSize];
-        int attempts = 0;
+        ArrayList<String> alphaCells = new ArrayList<>();
         boolean success = false;
-        int location = 0;
 
         shipCount++;
-        int incr = 1;
+        boolean horizontal = true;
         if ((shipCount % 2) == 1) {
-            incr = gridLength;
+            System.out.println(shipCount);
+            horizontal = false;
         }
-
-        while (!success && attempts++ < 200) {
-            location = (int) (Math.random() * gridSize);
-            int x = 0;
-            success = true;
-            while (success && x < shipSize) {
-                if (grid[location] == 0) {
-                    coords[x++] = location;
-                    location += incr;
-                    if (location >= gridSize) {
-                        success = false;
-                    }
-                    if (x > 0 && (location % gridLength == 0)) {
-                        success = false;
-                    }
+        while (!success) {
+            int row = (int) (Math.random() * gridLength);
+            int column = (int) (Math.random() * gridLength);
+            String temp = String.valueOf(alphabet.charAt(column)).concat(Integer.toString(row));
+            alphaCells.add(temp);
+            success = checkCoords(temp);
+            int i = 0;
+            int tempr = row;
+            int tempc = column;
+            while (success && i < shipSize) {
+                if (!horizontal) {
+                    temp = String.valueOf(alphabet.charAt(column + 1)).concat(Integer.toString(row));
+                    tempc++;
                 } else {
-                    success = false;
+                    temp = String.valueOf(alphabet.charAt(column)).concat(Integer.toString(row + 1));
+                    tempr++;
                 }
-            }
-        }
-        int x = 0;
-        int row = 0;
-        int column = 0;
-        while (x < shipSize) {
-            grid[coords[x]] = 1;
-            row = (int) (coords[x] / gridLength);
-            column = coords[x] % gridLength;
-            temp = String.valueOf(alphabet.charAt(column));
-            alphaCells.add(temp.concat(Integer.toString(row)));
-            x++;
-        }
-        for (String coordinate : alphaCells) {
-            if (takenCoords.size() > 0) {
-                for (int j = 0; j < takenCoords.size(); j++) {
-                    if (coordinate == takenCoords.get(j)) {
-                        alphaCells = placeShip(shipSize);
-                        break;
+                success = checkCoords(temp);
+                if (success) {
+                    if (tempr > gridLength || tempc > gridLength) {
+                        success = false;
+                    } else {
+                        alphaCells.add(temp);
                     }
                 }
+                i++;
             }
-        }
-        for (String coordinate : alphaCells) {
-            takenCoords.add(coordinate);
         }
         return alphaCells;
+    }
+
+    private boolean checkCoords(String coord) {
+        boolean out = true;
+        for (int i = 0; i < takenCoords.size(); i++) {
+            if (takenCoords.get(i).equalsIgnoreCase(coord)) {
+                out = false;
+            }
+        }
+        return out;
     }
 }
